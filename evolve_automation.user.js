@@ -10128,6 +10128,11 @@
                         logPrestige();
                     }
                     ["tech-infusion_confirm", "tech-infusion_check", "tech-exotic_infusion"].forEach(id => techIds[id].click());
+                } else {
+                    let stabilize_blackhole = techIds["tech-stabilize_blackhole"];
+                    if (getBlackholeMass() < settings.prestigeWhiteholeMinMass && stabilize_blackhole.isUnlocked() && stabilize_blackhole.isAffordable()) {
+                        stabilize_blackhole.click();
+                    }
                 }
                 return;
             case 'apocalypse':
