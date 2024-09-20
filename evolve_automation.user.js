@@ -2323,10 +2323,10 @@
         Stone: new ResourceAction("Gather Stone", "city", "stone", "", "Stone"),
         Chrysotile: new ResourceAction("Gather Chrysotile", "city", "chrysotile", "", "Chrysotile"),
         Slaughter: new Action("Slaughter the Weak", "city", "slaughter", ""),
-        ForgeHorseshoe: new ResourceAction("Horseshoe", "city", "horseshoe", "", "Horseshoe", {housing: true, garrison: true}),
-        SlaveMarket: new ResourceAction("Slave Market", "city", "slave_market", "", "Slave"),
+        ForgeHorseshoe: new ResourceAction("Horseshoe", "city", "horseshoe", "", "Horseshoe", {housing: true, garrison: true, multiSegmented: true}),
+        SlaveMarket: new ResourceAction("Slave Market", "city", "slave_market", "", "Slave", {multiSegmented: true}),
         SacrificialAltar: new Action("Sacrificial Altar", "city", "s_alter", ""),
-        House: new Action("Cabin", "city", "basic_housing", "", {housing: true}),
+        House: new Action("Cabin", "city", "basic_housing", "", {housing: true, multiSegmented: true}),
         Cottage: new Action("Cottage", "city", "cottage", "", {housing: true}),
         Apartment: new Action("Apartment", "city", "apartment", "", {housing: true}),
         Lodge: new Action("Lodge", "city", "lodge", "", {housing: true}),
@@ -2425,7 +2425,7 @@
 
         SunMission: new Action("Sun Mission", "space", "sun_mission", "spc_sun"),
         SunSwarmControl: new Action("Sun Control Station", "space", "swarm_control", "spc_sun"),
-        SunSwarmSatellite: new Action("Sun Swarm Satellite", "space", "swarm_satellite", "spc_sun"),
+        SunSwarmSatellite: new Action("Sun Swarm Satellite", "space", "swarm_satellite", "spc_sun", {multiSegmented: true}),
         SunJumpGate: new Action("Sun Jump Gate", "space", "jump_gate", "spc_sun", {multiSegmented: true}),
 
         GasMission: new Action("Gas Mission", "space", "gas_mission", "spc_gas"),
@@ -9591,6 +9591,7 @@
         // Just assume that smelters will always be fueled so Iron smelting is unlimited
         // We want to work out the maximum steel smelters that we can have based on our resource consumption
         let steelSmeltingConsumption = m.Productions.Steel.cost;
+        let steelConsumptionMissing = false;
         for (let productionCost of steelSmeltingConsumption) {
             let resource = productionCost.resource;
             // Allow using all resources for Steel until 60s of consumption left, unless demanded.
@@ -9600,13 +9601,25 @@
                 let affordableAmount = Math.max(0, Math.floor(remainingRateOfChange / productionCost.quantity));
                 if (affordableAmount < maxAllowedSteel) {
                     state.tooltips["smelterMatssteel"] = `Too low ${resource.name} income<br>`;
+                    steelConsumptionMissing = true;
+                    maxAllowedSteel = Math.min(maxAllowedSteel, affordableAmount);
                 }
-                maxAllowedSteel = Math.min(maxAllowedSteel, affordableAmount);
+            }
+
+            // Set 120s of consumption as demanded
+            let req = ((smelterSteelCount * productionCost.quantity) * CONSUMPTION_BALANCE_TARGET + productionCost.minRateOfChange);
+            if (resource.currentQuantity < req && resource.requestedQuantity < req) {
+                resource.requestedQuantity = req;
             }
         }
 
+        // Users might make weird calculations in overrides, so be sure to clamp to 0-1 range
+        let maxIronRatio = Math.min(1, Math.max(settings.productionSmeltingMaxIronRatio, 0));
+
+        // Set initially wanted ratio
         let ironWeighting = 0;
         let steelWeighting = 0;
+        let allowDemand = true;
         switch (settings.productionSmelting){
             case "iron":
                 ironWeighting = resources.Iron.timeToFull;
@@ -9620,6 +9633,17 @@
                     ironWeighting = resources.Iron.timeToFull;
                 }
                 break;
+            case "configuredRatio":
+                allowDemand = false;
+                steelWeighting = resources.Steel.timeToFull;
+                if (!steelWeighting) {
+                    ironWeighting = resources.Iron.timeToFull;
+                }
+                else {
+                    ironWeighting = steelWeighting * maxIronRatio;
+                    steelWeighting *= 1 - maxIronRatio;
+                }
+                break;
             case "storage":
                 ironWeighting = resources.Iron.timeToFull;
                 steelWeighting = resources.Steel.timeToFull;
@@ -9630,31 +9654,68 @@
                 break;
         }
 
-        if (resources.Iron.isDemanded()) {
-            ironWeighting = Number.MAX_SAFE_INTEGER;
+        // If user isn't configuring ratio manually, make demanded override ratios, but Iron demand only goes to a certain %.
+        if (allowDemand) {
+            if (resources.Steel.isDemanded() && !steelConsumptionMissing) {
+                steelWeighting = Number.MAX_SAFE_INTEGER;
+            }
+            else if (resources.Iron.isDemanded()) {
+                ironWeighting = steelWeighting < 1 ? Number.MAX_SAFE_INTEGER : (steelWeighting * maxIronRatio);
+                steelWeighting *= 1 - maxIronRatio;
+            }
         }
-        if (resources.Steel.isDemanded()) {
-            steelWeighting = Number.MAX_SAFE_INTEGER;
-        }
+
+        // If no Iron sources, Iron smelters do nothing, turn them off.
         if (jobs.Miner.count === 0 && buildings.BeltIronShip.stateOnCount === 0) {
             ironWeighting = 0;
             steelWeighting = 1;
             maxAllowedSteel = totalSmelters - smelterIridiumCount;
         }
 
-        // We have more steel than we can afford OR iron income is too low
-        if (smelterSteelCount > maxAllowedSteel || smelterSteelCount > 0 && ironWeighting > steelWeighting) {
-            smeltAdjust.Steel--;
+        // If Iron or Steel (including Titanium if produced as byproduct) are full, turn them off.
+        let allowIronSmelting = resources.Iron.storageRatio < 0.99;
+        let allowSteelSmelting = (resources.Steel.storageRatio < 0.99) || (resources.Titanium.storageRatio < 0.99 && haveTech("titanium"));
+        if (!allowIronSmelting) {
+            ironWeighting = 0;
+        }
+        if (!allowSteelSmelting) {
+            steelWeighting = 0;
+            // Pivot to Iron again if Steel is full but Iron is not, just unweighted
+            if (allowIronSmelting && !ironWeighting) {
+                ironWeighting = 1;
+            }
         }
 
-        // We can afford more steel AND either steel income is too low OR both steel and iron full, but we can use steel smelters to increase titanium income
-        if (smelterSteelCount < maxAllowedSteel && smelterIronCount > 0 &&
-             ((steelWeighting > ironWeighting) ||
-              (steelWeighting <= 0 && ironWeighting <= 0 && resources.Titanium.storageRatio < 0.99 && haveTech("titanium")))) {
-            smeltAdjust.Steel++;
+        // Steel and Iridium share a part of maxAllowedSteel.
+        let totalWeighting = ironWeighting + steelWeighting;
+        let smeltersToSplit = totalSmelters - smelterIridiumCount;
+        let realSteelRatio = totalWeighting > 0 ? (steelWeighting / totalWeighting) : 1;
+
+        let newWantedSteelCount = 0;
+
+        if (allowIronSmelting && allowSteelSmelting) {
+            // Split using calculated ratio
+            newWantedSteelCount = Math.ceil(realSteelRatio * smeltersToSplit);
+        }
+        else if (allowSteelSmelting) {
+            // All steel
+            newWantedSteelCount = smeltersToSplit;
         }
 
-        smeltAdjust.Iron = totalSmelters - (smelterIronCount + smelterSteelCount + smeltAdjust.Steel + smelterIridiumCount + smeltAdjust.Iridium);
+        // But what if we can't produce this much Steel? Then cap
+        if (newWantedSteelCount > maxAllowedSteel) {
+            newWantedSteelCount = maxAllowedSteel;
+        }
+
+        // Compute iron smelters as rest of remaining share
+        let newWantedIronCount = allowIronSmelting ? Math.max(0, smeltersToSplit - newWantedSteelCount) : 0;
+
+        // Compare to actual smelters.
+        smeltAdjust.Iron = newWantedIronCount - smelterIronCount;
+        smeltAdjust.Steel = newWantedSteelCount - smelterSteelCount;
+
+        //console.debug("smeltAdjust: %o / realSteelRatio: %f", smeltAdjust, realSteelRatio);
+
         Object.entries(smeltAdjust).forEach(([id, delta]) => delta < 0 && m.decreaseSmelting(id, delta * -1));
         Object.entries(smeltAdjust).forEach(([id, delta]) => delta > 0 && m.increaseSmelting(id, delta));
     }
@@ -9675,7 +9736,7 @@
             state.tooltips["iFactory" + production.id] = `Disabled<br>`;
             if (production.unlocked && production.enabled) {
                 if (production.weighting > 0) {
-                    let priority = production.resource.isDemanded() ? Math.max(production.priority, 100) : production.priority;
+                    let priority = (production.resource.isDemanded() && production.id !== "Lux") ? Math.max(production.priority, 100) : production.priority;
                     if (priority !== 0) {
                         priorityGroups[priority] = priorityGroups[priority] ?? [];
                         priorityGroups[priority].push(production);
@@ -11984,7 +12045,7 @@
             newShip = m._explorerBlueprint;
             minCrew = 0;
         } else {
-            let scanEris = game.global.tech['eris'] === 1 && m.getWeighting("spc_eris") > 0 && m.syndicate("spc_eris", true, true).s < 50;
+            let scanEris = game.global.tech['eris'] === 1 && m.getWeighting("spc_eris") > 0 && (game.global.space.m_relay?.charged >= 10000 ? m.syndicate("spc_eris", true, true).s < 110 : m.syndicate("spc_eris", true, true).s < 50);
             if (scanEris) {
                 targetRegion = "spc_eris";
                 minCrew = 0;
@@ -12009,7 +12070,7 @@
                 if (m.avail(scout) && m.shipCount(targetRegion, scout) < m.getMaxScouts(targetRegion)) {
                     newShip = scout;
                 }
-                if (!newShip) {
+                if (!newShip && m.syndicate(targetRegion, false, true) < m.getMaxDefense(targetRegion)) {
                     let fighter =  m.getFighterBlueprint();
                     newShip = m.avail(fighter) ? fighter : null;
                 }
@@ -12581,11 +12642,11 @@
                 for (let res in demandedObject.cost) {
                     let resource = resources[res];
                     let quantity = demandedObject.cost[res];
-                    // Double request for project, to make it smoother
-                    if (demandedObject instanceof Project && demandedObject.progress < 99) {
-                        quantity *= 2;
+                    // Make an attempt to demand the entire project
+                    if (demandedObject instanceof Project && res !== "Knowledge") {
+                        quantity *= (100 - demandedObject.progress) / demandedObject.currentStep;
                     }
-                    resource.requestQuantity(quantity);
+                    resource.requestedQuantity = Math.max(resource.requestedQuantity, quantity);
                 }
             }
         }
@@ -17203,10 +17264,12 @@
         addStandardHeading(currentNode, "Smelter");
 
         let smelterOptions = [{val: "iron", label: "Prioritize Iron", hint: "Produce only Iron, untill storage capped, and switch to Steel after that"},
-                              {val: "steel", label: "Prioritize Steel", hint: "Produce as much Steel as possible, untill storage capped, and switch to Iron after that"},
+                              {val: "steel", label: "Prioritize Steel", hint: "Produce as much Steel as possible, unless Iron is demanded but Steel is not, in which case up to 'Maximum Iron ratio' is dedicated to Iron"},
+                              {val: "configuredRatio", label: "Configured Iron Ratio", hint: "Manage Steel / Iron ratio manually using 'Maximum Iron ratio'"},
                               {val: "storage", label: "Up to full storages", hint: "Produce both Iron and Steel at ratio which will fill both storages at same time for both"},
                               {val: "required", label: "Up to required amounts", hint: "Produce both Iron and Steel at ratio which will produce maximum amount of resources required for buildings at same time for both"}];
         addSettingsSelect(currentNode, "productionSmelting", "Smelters production", "Distribution of smelters between iron and steel", smelterOptions);
+        addSettingsNumber(currentNode, "productionSmeltingMaxIronRatio", "Maximum Iron ratio", "When using 'Configured Iron Ratio' mode: Share of smelters dedicated to Iron regardless of settings or demand, unless resource full. When using other mode: Maximum allowed share while Iron is demanded.");
         addSettingsNumber(currentNode, "productionSmeltingIridium", "Iridium ratio", "Share of smelters dedicated to Iridium");
 
         currentNode.append(`
@@ -18551,7 +18614,7 @@
 
     function createBuildingToggles() {
         removeBuildingToggles();
-
+        return;
         // Building toggles redraw much more often than other toggles.
         // With settings off, disable them.
         if (!settings.showSettings) return;
