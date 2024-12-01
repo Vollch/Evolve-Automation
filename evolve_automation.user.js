@@ -12424,6 +12424,16 @@
         ];
         let minPower = allFleets[0].power;
 
+        const piracyMultiplier = 1 *
+            (game.global.race.chicken ? traitVal('chicken', 1, '+') : 1) *
+            (game.global.race['ocular_power'] && game.global.race?.ocularPowerConfig?.f ? 1 - (traitVal('ocular_power', 1) / 500) : 1)
+        ;
+        if (piracyMultiplier !== 1) {
+            allRegions.forEach(region => {
+                region.piracy *= piracyMultiplier;
+            });
+        }
+
         // We can't rely on stateOnCount - it won't give us correct number of ships of some of them missing crew
         let fleetIndex = Object.fromEntries(allFleets.map((ship, index) => [ship.name, index]));
         Object.values(def).forEach(assigned => Object.entries(assigned).forEach(([ship, count]) => allFleets[fleetIndex[ship]].count += Math.floor(count)));
