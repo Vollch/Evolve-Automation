@@ -7381,6 +7381,11 @@
             def['mTrait_w_' + id] = 1; // weighting
         }
 
+        Object.values(ocularPowerData).forEach(v => {
+            def['ocularPower_' + v.id] = true;
+            def['ocularPower_p_' + v.id] = 100;
+        });
+
         applySettings(def, reset);
         MinorTraitManager.sortByPriority();
     }
@@ -10634,6 +10639,45 @@
                 return; // Very last option, attack boost
             }
         }
+    }
+
+    const ocularPowerData = [
+        { key: "d", id: "disintegration", locParam: ["X"] },
+        { key: "p", id: "petrification", locParam: [resources.Stone.name] },
+        { key: "w", id: "wound", locParam: ["X"] },
+        { key: "t", id: "telekinesis", locParam: ["X"] },
+        { key: "f", id: "fear", locParam: undefined },
+        { key: "c", id: "charm", locParam: ["X"] },
+    ];
+
+    function autoOcularPowers() {
+        if (!game.global.race['ocular_power'] || !game.global.race['ocularPowerConfig']) {
+            return false;
+        }
+
+        const vue = getVueById("ocularPower");
+        if (!vue) return false;
+
+        let powerCap = traitVal('ocular_power', 0);
+        if (powerCap < 1) return false;
+
+        let allPowers = ocularPowerData.map((p) => {
+            return {
+                key: p.key,
+                id: p.id,
+                enabled: Boolean(settings[`ocularPower_${p.id}`]),
+                priority: Number(settings[`ocularPower_p_${p.id}`]),
+            }
+        }).sort((a, b) => b.priority - a.priority);
+        let enabledPowers = 0;
+        allPowers.forEach(p => {
+            let enable = p.enabled && (enabledPowers < powerCap);
+            if (enable) enabledPowers++;
+
+            if (vue[p.key] !== enable) {
+                document.getElementById(`ocular${p.id}`).querySelector("input").click();
+            }
+        });
     }
 
     function autoGenetics() {
@@ -13960,6 +14004,7 @@
         if (settings.autoMinorTrait) {
             autoShapeshift(); // Shifting genus can remove techs, buildings, resources, etc. Leaving broken preloaded buttons behind. This thing need to be at the very end, to prevent clicking anything before redrawing tabs
             autoPsychic();
+            autoOcularPowers();
         }
         if (settings.autoMutateTraits) {
             autoMutateTrait();
@@ -17206,6 +17251,32 @@
 
         addSettingsToggle(currentNode, "jobScalePop", "High Pop job scale", "Auto Job will automatically scaly breakpoints to match population increase");
 
+        addStandardHeading(currentNode, "Ocular Powers");
+        currentNode.append(`
+          <table style="width:100%">
+            <tr>
+              <th class="has-text-warning" style="width:50%">Name</th>
+              <th class="has-text-warning" style="width:25%">Enabled</th>
+              <th class="has-text-warning" style="width:25%">Priority</th>
+            </tr>
+            <tbody id="script_ocularPowersTableBody"></tbody>
+          </table>
+        `);
+        const ocularTableBodyNode = $("#script_ocularPowersTableBody");
+        ocularPowerData.forEach(p => {
+            let tr = $(`<tr><td></td><td></td><td></td></tr>`);
+            tr.appendTo(ocularTableBodyNode);
+
+            let ocularPowerElement = tr.find("td").first();
+            ocularPowerElement.append(buildTableLabel(game.loc(`ocular_${p.id}`), game.loc(`ocular_${p.id}_desc`, p.locParam)));
+
+            ocularPowerElement = ocularPowerElement.next();
+            addTableToggle(ocularPowerElement, `ocularPower_${p.id}`);
+
+            ocularPowerElement = ocularPowerElement.next();
+            addTableInput(ocularPowerElement, `ocularPower_p_${p.id}`);
+        });
+
         // Minor Traits
         addStandardHeading(currentNode, "Minor Traits");
 
@@ -18621,7 +18692,7 @@
             createSettingToggle(togglesNode, 'autoMiningDroid', 'Manages mining droid production.');
             createSettingToggle(togglesNode, 'autoGraphenePlant', 'Manages graphene plant. Not user configurable - just uses least demanded resource for fuel.');
             createSettingToggle(togglesNode, 'autoGenetics', 'Managed genetics settings, and automatically assembles genes more optimally than ingame sequencer');
-            createSettingToggle(togglesNode, 'autoMinorTrait', 'Purchase minor traits using genes according to their weighting settings. Also manages Mimic genus, and Psychic powers.');
+            createSettingToggle(togglesNode, 'autoMinorTrait', 'Purchase minor traits using genes according to their weighting settings. Also manages Mimic genus, Psychic powers and Ocular powers.');
             createSettingToggle(togglesNode, 'autoMutateTraits', 'Mutate in or out major and genus traits. WARNING: This will spend Plasmids and Anti-Plasmids.');
             createSettingToggle(togglesNode, 'autoEject', 'Eject excess resources to black hole. Normal resources ejected when they close to storage cap, craftables - when above requirements. Disabled when Mass Ejector Optimizer governor task is active.', createEjectToggles, removeEjectToggles);
             createSettingToggle(togglesNode, 'autoSupply', 'Send excess resources to Spire. Normal resources sent when they close to storage cap, craftables - when above requirements. Takes priority over ejector.', createSupplyToggles, removeSupplyToggles);
