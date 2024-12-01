@@ -7365,6 +7365,8 @@
             jobScalePop: true,
             psychicPower: "auto",
             psychicBoostRes: "auto",
+            wishMinor: "none",
+            wishMajor: "none",
 
             autoGenetics: false,
             geneticsSequence: "none",
@@ -10678,6 +10680,48 @@
                 document.getElementById(`ocular${p.id}`).querySelector("input").click();
             }
         });
+    }
+
+    const wishData = {
+        minor: [
+            { id: "Know", loc: "resource_Knowledge_name" },
+            { id: "Money", loc: "resource_Money_name" },
+            { id: "Res", loc: "wish_resources" },
+            { id: "Love", loc: "wish_love" },
+            { id: "Excite", loc: "wish_event" },
+            { id: "Fame", loc: "wish_fame" },
+            { id: "Strength", loc: "wish_strength" },
+            { id: "Influence", loc: "wish_influence" },
+        ],
+        major: [
+            { id: "BigMoney", loc: "wish_big_money" },
+            { id: "BigRes", loc: "wish_big_resources" },
+            { id: "Plasmid", loc: "wish_plasmid" },
+            { id: "Power", loc: "wish_power" },
+            { id: "Adoration", loc: "wish_adoration" },
+            { id: "Thrill", loc: "wish_thrill" },
+            { id: "Peace", loc: "wish_peace" },
+            { id: "Greatness", loc: "wish_greatness" },
+        ],
+    };
+    function autoWish() {
+        if (!game.global.race['wish'] || !game.global.tech['wish']) {
+            return false;
+        }
+
+        if (game.global.race.wishStats.minor === 0 && settings.wishMinor !== "none") {
+            const vueMinor = getVueById("minorWish");
+            if (!vueMinor) return false;
+
+            $(`#wish${settings.wishMinor}`).click();
+        }
+
+        if (game.global.tech['wish'] >= 2 && game.global.race.wishStats.major === 0 && settings.wishMajor !== "none") {
+            const vueMajor = getVueById("majorWish");
+            if (!vueMajor) return false;
+
+            $(`#wish${settings.wishMajor}`).click();
+        }
     }
 
     function autoGenetics() {
@@ -14005,6 +14049,7 @@
             autoShapeshift(); // Shifting genus can remove techs, buildings, resources, etc. Leaving broken preloaded buttons behind. This thing need to be at the very end, to prevent clicking anything before redrawing tabs
             autoPsychic();
             autoOcularPowers();
+            autoWish();
         }
         if (settings.autoMutateTraits) {
             autoMutateTrait();
@@ -17249,6 +17294,13 @@
                              ...Object.values(resources).filter(r => r.atomicMass > 0).map(r => ({val: r.id, label: r.title}))];
         addSettingsSelect(currentNode, "psychicBoostRes", "Boosted Resource", "Resource for Boost Resource Production psychic power.", psychicBoost);
 
+        let wishMinor = [{ val: "none", label: "None", hint: "Disable using minor wishes." },
+            ...wishData.minor.map(w => ({ val: w.id, label: game.loc('wish_for', [game.loc(w.loc)]) }))];
+        addSettingsSelect(currentNode, "wishMinor", "Minor Wish", "Uses this minor wish when available.", wishMinor);
+        let wishMajor = [{ val: "none", label: "None", hint: "Disable using major wishes." },
+            ...wishData.major.map(w => ({ val: w.id, label: game.loc('wish_for', [game.loc(w.loc)]) }))];
+        addSettingsSelect(currentNode, "wishMajor", "Major Wish", "Uses this major wish when available.", wishMajor);
+
         addSettingsToggle(currentNode, "jobScalePop", "High Pop job scale", "Auto Job will automatically scaly breakpoints to match population increase");
 
         addStandardHeading(currentNode, "Ocular Powers");
@@ -18692,7 +18744,7 @@
             createSettingToggle(togglesNode, 'autoMiningDroid', 'Manages mining droid production.');
             createSettingToggle(togglesNode, 'autoGraphenePlant', 'Manages graphene plant. Not user configurable - just uses least demanded resource for fuel.');
             createSettingToggle(togglesNode, 'autoGenetics', 'Managed genetics settings, and automatically assembles genes more optimally than ingame sequencer');
-            createSettingToggle(togglesNode, 'autoMinorTrait', 'Purchase minor traits using genes according to their weighting settings. Also manages Mimic genus, Psychic powers and Ocular powers.');
+            createSettingToggle(togglesNode, 'autoMinorTrait', 'Purchase minor traits using genes according to their weighting settings. Also manages Mimic genus, Psychic powers, Ocular powers and wishes.');
             createSettingToggle(togglesNode, 'autoMutateTraits', 'Mutate in or out major and genus traits. WARNING: This will spend Plasmids and Anti-Plasmids.');
             createSettingToggle(togglesNode, 'autoEject', 'Eject excess resources to black hole. Normal resources ejected when they close to storage cap, craftables - when above requirements. Disabled when Mass Ejector Optimizer governor task is active.', createEjectToggles, removeEjectToggles);
             createSettingToggle(togglesNode, 'autoSupply', 'Send excess resources to Spire. Normal resources sent when they close to storage cap, craftables - when above requirements. Takes priority over ejector.', createSupplyToggles, removeSupplyToggles);
