@@ -1532,6 +1532,7 @@
 
             const noMADRace = ["sludge", "ultra_sludge"];
             const noGenusRace = ["custom", "junker", "sludge", "ultra_sludge", "hybrid"];
+            const noGreatnessGenus = ["hybrid"];
             const challengeRace = ["junker", "sludge", "ultra_sludge"];
             const greatnessReset = ["bioseed", "ascension", "terraform", "matrix", "retire", "eden"];
             const midTierReset = ["bioseed", "cataclysm", "whitehole", "vacuum", "terraform"];
@@ -1581,7 +1582,9 @@
 
             // Check greatness\extinction achievement
             if (greatnessReset.includes(settings.prestigeType)) {
-                checkAchievement(100, "genus_" + this.genus);
+                if (!noGreatnessGenus.includes(this.genus)) {
+                    checkAchievement(100, "genus_" + this.genus);
+                }
             } else if (!noMADRace.includes(this.id) || settings.prestigeType !== "mad") {
                 checkAchievement(100, "extinct_" + this.id);
             }
