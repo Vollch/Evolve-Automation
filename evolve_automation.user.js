@@ -11483,7 +11483,7 @@
                     if ((buildings.ChthonianRaider.stateOnCount === 0 && buildings.ChthonianExcavator.stateOnCount === 0) || buildings.GatewayStarbase.stateOnCount === 0) {
                         maxStateOn = 0;
                     } else {
-                        let mineAdjust = ((game.global.race['instinct'] ? 7000 : 7500) - poly.piracy("gxy_chthonian")) / game.actions.galaxy.gxy_chthonian.minelayer.ship.rating();
+                        let mineAdjust = (((game.global.race['instinct'] ? 7000 : 7500) * getPiracyMultiplier()) - poly.piracy("gxy_chthonian")) / game.actions.galaxy.gxy_chthonian.minelayer.ship.rating();
                         maxStateOn = Math.min(maxStateOn, currentStateOn + Math.ceil(mineAdjust));
                     }
                 }
@@ -12400,6 +12400,12 @@
         }
     }
 
+    function getPiracyMultiplier() {
+        return 1 *
+            (game.global.race.chicken ? traitVal('chicken', 1, '+') : 1) *
+            (game.global.race['ocular_power'] && game.global.race?.ocularPowerConfig?.f ? 1 - (traitVal('ocular_power', 1) / 500) : 1)
+    }
+
     function autoFleet() {
         if (!FleetManager.initFleet()) {
             return;
@@ -12424,10 +12430,7 @@
         ];
         let minPower = allFleets[0].power;
 
-        const piracyMultiplier = 1 *
-            (game.global.race.chicken ? traitVal('chicken', 1, '+') : 1) *
-            (game.global.race['ocular_power'] && game.global.race?.ocularPowerConfig?.f ? 1 - (traitVal('ocular_power', 1) / 500) : 1)
-        ;
+        const piracyMultiplier = getPiracyMultiplier();
         if (piracyMultiplier !== 1) {
             allRegions.forEach(region => {
                 region.piracy *= piracyMultiplier;
