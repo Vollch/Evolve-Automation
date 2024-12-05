@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         Evolve
 // @namespace    http://tampermonkey.net/
-// @version      3.3.1.137
+// @version      3.3.1.138
 // @description  try to take over the world!
 // @downloadURL  https://gist.github.com/Vollch/b1a5eec305558a48b7f4575d317d7dd1/raw/evolve_automation.user.js
 // @updateURL    https://gist.github.com/Vollch/b1a5eec305558a48b7f4575d317d7dd1/raw/evolve_automation.meta.js
@@ -2811,7 +2811,7 @@
         PalaceThrone: new Action("Palace Throne", "eden", "throne", "eden_palace"),
         PalaceInfuser: new Action("Palace Infuser", "eden", "infuser", "eden_palace", {multiSegmented: true}),
         PalaceApotheosis: new Action("Palace Apotheosis", "eden", "apotheosis", "eden_palace", {prestige: true}),
-        PalaceConduit: new Action("Palace Conduit", "eden", "conduit", "eden_palace"),
+        PalaceConduit: new Action("Palace Conduit", "eden", "conduit", "eden_palace", {multiSegmented: true}),
         PalaceTomb: new Action("Palace Tomb", "eden", "tomb", "eden_palace", {multiSegmented: true}),
 
     }
