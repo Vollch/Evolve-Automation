@@ -3877,6 +3877,27 @@
             let vue = getVueById(this._alchemyVuePrefix + id);
             if (vue === undefined) { return false; }
 
+            if (settings.performanceHackAlchemy) {
+                // Avoid clean code below and instead read and manipulate game data directly to avoid loadAlchemy>vBind>addSpell
+                // `for i = 0; i < count` inner loop that causes prestige-scaled amounts of lag.
+                // We need to use and modify the "real" mana rate of change directly to match game logic.
+                const manaResourceVue = getVueById("resMana");
+                if (manaResourceVue === undefined || typeof manaResourceVue.diff !== "number" || typeof vue.a !== "object" || typeof vue.a[id] !== "number") {
+                    return;
+                }
+                const diff = Math.floor(Math.min(manaResourceVue.diff, count));
+                if (diff < 1) {
+                    return;
+                }
+
+                vue.a[id] += diff;
+                manaResourceVue.diff -= diff * 1;
+
+                resources.Mana.rateOfChange -= diff * 1;
+                resources.Crystal.rateOfChange -= diff * 0.5;
+                return;
+            }
+
             resources.Mana.rateOfChange -= count * 1;
             resources.Crystal.rateOfChange -= count * 0.5;
 
@@ -3888,6 +3909,27 @@
         transmuteLess(id, count) {
             let vue = getVueById(this._alchemyVuePrefix + id);
             if (vue === undefined) { return false; }
+
+            if (settings.performanceHackAlchemy) {
+                // Avoid clean code below and instead read and manipulate game data directly to avoid loadAlchemy>vBind>subSpell
+                // `for i = 0; i < count` inner loop that causes prestige-scaled amounts of lag.
+                // Need to be very sure we aren't removing more than we have to match game logic.
+                const manaResourceVue = getVueById("resMana");
+                if (manaResourceVue === undefined || typeof manaResourceVue.diff !== "number" || typeof vue.a !== "object" || typeof vue.a[id] !== "number") {
+                    return;
+                }
+                const diff = Math.floor(Math.min(vue.a[id], count));
+                if (diff < 1) {
+                    return;
+                }
+
+                vue.a[id] -= diff;
+                manaResourceVue.diff += diff * 1;
+
+                resources.Mana.rateOfChange += diff * 1;
+                resources.Crystal.rateOfChange += diff * 0.5;
+                return;
+            }
 
             resources.Mana.rateOfChange += count * 1;
             resources.Crystal.rateOfChange += count * 0.5;
@@ -7202,6 +7244,7 @@
             displayTotalDaysTypeInTopBar: false,
             scriptSettingsExportFilename: "evolve-script-settings.json",
             performanceHackAvoidDrawTech: false,
+            performanceHackAlchemy: false,
         }
 
         applySettings(def, reset);
@@ -15708,8 +15751,9 @@
         addSettingsHeader1(currentNode, "Misc");
         addSettingsString(currentNode, "scriptSettingsExportFilename", "Export Filename", "Configures the filename used when using the 'Script Settings as File' button. This is useful if you keep multiple different profiles around.");
 
-        addSettingsHeader1(currentNode, "Experimental");
+        addSettingsHeader1(currentNode, "Performance Hacks (Experimental)");
         addSettingsToggle(currentNode, "performanceHackAvoidDrawTech", "Enable performance hack: drawTech avoidance", "Enables very experimental and potentially buggy performance hacks designed to avoid excessive redraws of the research tab, which appears to be very CPU-intensive to redraw. This improves game performance when buying lots of buildings, but also causes potentially limitless amounts of bugs as important game code may be skipped.");
+        addSettingsToggle(currentNode, "performanceHackAlchemy", "Enable performance hack: Alchemy", "Enables experimental and potentially buggy performance hack that avoids a very performance intensive inner loop in game code when manipulating alchemy. Instead of automating clicks, the script will instead modify game data directly. Performance benefit scales with your mana production; you should leave this off unless you have extremely high prestige and the game starts to lag after building Mana Syphons (probably somewhere around 100K Mana/second but it will depend on your hardware).");
 
         document.documentElement.scrollTop = document.body.scrollTop = currentScrollPosition;
     }
