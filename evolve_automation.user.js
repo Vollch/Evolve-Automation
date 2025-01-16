@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         Evolve
 // @namespace    http://tampermonkey.net/
-// @version      3.3.1.139
+// @version      3.3.1.140
 // @description  try to take over the world!
 // @downloadURL  https://github.com/Vollch/Evolve-Automation/raw/master/evolve_automation.user.js
 // @updateURL    https://github.com/Vollch/Evolve-Automation/raw/master/evolve_automation.meta.js
@@ -9913,6 +9913,13 @@
 
         let allProducts = Object.values(FactoryManager.Productions);
 
+        if (settings.productionFactoryWeighting === "demanded") {
+            let usefulProducts = allProducts.filter(production => production.resource.currentQuantity < production.resource.storageRequired);
+            if (usefulProducts.length > 0) {
+                allProducts = usefulProducts;
+            }
+        }
+
         // Init adjustment, and sort groups by priorities
         let priorityGroups = {};
         let factoryAdjustments = {};
@@ -9937,20 +9944,9 @@
             priorityList[0].push(...priorityGroups["-1"]);
         }
 
-        let onDemand = false;
-        if (settings.productionFactoryWeighting === "demanded") {
-            let usefulProducts = allProducts.filter(production => production.resource.currentQuantity < production.resource.storageRequired);
-            if (usefulProducts.length > 0) {
-                onDemand = true;
-            }
-        }
-
-        const scalingFactor = 
-            settings.productionFactoryWeighting === "buildings" && state.unlockedBuildings.length > 0 
-                ? (resource) => (findRequiredResourceWeight(resource) ?? 100) :
-            settings.productionFactoryWeighting === "demanded" && onDemand 
-                ? (resource) => (resource.currentQuantity < resource.storageRequired ? 1 : 0) :
-            () => 1;
+        const scalingFactor = settings.productionFactoryWeighting === "buildings" && state.unlockedBuildings.length > 0
+            ? (resource) => findRequiredResourceWeight(resource) ?? 100
+            : () => 1;
         const scaledWeights = Object.fromEntries(allProducts.map(production => [production.resource.id, production.weighting * scalingFactor(production.resource)]));
 
         // Calculate amount of factories per product
