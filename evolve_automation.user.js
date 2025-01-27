@@ -12130,7 +12130,7 @@
             if (trait.canGain()) {
                 let mutationCost = trait.mutationCost('gain');
                 m.gainTrait(trait.traitName);
-                GameLog.logSuccess("mutation", `Mutating in ${trait.name} for ${mutationCost} ${currency.name}`);
+                GameLog.logSuccess("mutation", `Mutating in ${trait.name} for ${mutationCost} ${currency.name}`, ['progress']);
                 currency.currentQuantity -= mutationCost;
                 return; // only mutate one trait per tick, to reduce lag
             }
@@ -12138,7 +12138,7 @@
             if (trait.canPurge()) {
                 let mutationCost = trait.mutationCost('purge');
                 m.purgeTrait(trait.traitName);
-                GameLog.logSuccess("mutation", `Mutating out ${trait.name} for ${mutationCost} ${currency.name}`);
+                GameLog.logSuccess("mutation", `Mutating out ${trait.name} for ${mutationCost} ${currency.name}`, ['progress']);
                 currency.currentQuantity -= mutationCost;
                 return; // only mutate one trait per tick, to reduce lag
             }
