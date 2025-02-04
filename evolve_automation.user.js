@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         Evolve
 // @namespace    http://tampermonkey.net/
-// @version      3.3.1.139
+// @version      3.3.1.140
 // @description  try to take over the world!
 // @downloadURL  https://github.com/Vollch/Evolve-Automation/raw/master/evolve_automation.user.js
 // @updateURL    https://github.com/Vollch/Evolve-Automation/raw/master/evolve_automation.meta.js
@@ -1418,6 +1418,38 @@
     }
 
     class Technology {
+        // These techs have the same name as some others - use a descriptor for disambiguation
+        static techDiscriminators = {
+            wind_plant: "Power",
+            demonic_craftsman: "Evil",
+            evil_planning: "Evil",
+            adamantite_processing_flier: "Flier",
+            alt_anthropology: "Post-Transcendence",
+            alt_fanaticism: "Post-Transcendence",
+            study_alt: "Post-Preeminence",
+            deify_alt: "Post-Preeminence",
+            dyson_sphere: "Plans",
+            unification: "Plans",
+            exotic_infusion: "1st Warning",
+            infusion_check: "2nd Warning",
+            protocol66: "Warning",
+            bac_tanks_tp: "True Path",
+            ai_core_tp: "True Path",
+            terraforming_tp: "True Path",
+            higgs_boson_tp: "True Path",
+            stanene_tp: "True Path",
+            graphene_tp: "True Path",
+            virtual_reality_tp: "True Path",
+            adamantite_vault_tp: "True Path",
+            iridium_smelting: "True Path",
+            bolognium_crates_tp: "True Path",
+            adamantite_containers_tp: "True Path",
+            orichalcum_panels_tp: "True Path",
+            dreadnought_ship: "True Path",
+            fusion_generator: "True Path",
+            replicator: "Lone Survivor"
+        };
+
         constructor(id) {
             this._id = id;
 
@@ -1442,8 +1474,8 @@
         get title() {
             let def = this.definition;
             let title = typeof def.title === 'function' ? def.title() : def.title;
-            if (def.path && def.path.includes('truepath') && !def.path.includes('standard')) {
-                title += ` (${game.loc('evo_challenge_truepath')})`;
+            if (this._id in Technology.techDiscriminators) {
+                title += ` (${Technology.techDiscriminators[this._id]})`;
             }
             return title;
         }
