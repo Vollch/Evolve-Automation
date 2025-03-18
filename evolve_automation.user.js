@@ -2266,6 +2266,7 @@
         Mana: new Resource("Mana", "Mana"),
         Energy: new Resource("Energy", "Energy"),
         Sus: new Resource("Suspicion", "Sus"),
+        Authority: new Resource("Authority", "Authority"),
         Knowledge: new Resource("Knowledge", "Knowledge"),
         Omniscience: new Resource("Omniscience", "Omniscience"),
         Zen: new Resource("Zen", "Zen"),
