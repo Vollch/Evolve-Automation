@@ -5028,17 +5028,19 @@
         getHellReservedSoldiers(){
             let soldiers = 0;
 
+            const soldierRating = game.armyRating(1, "hellArmy");
+
             // Assign soldiers to assault forge once other requirements are met
-            if (settings.autoBuild && buildings.PitAssaultForge.isAutoBuildable()) {
+            if (settings.autoBuild && buildings.PitAssaultForge.isAutoBuildable() && soldierRating > 0) {
                 if (settings.hellAssaultReserve || !Object.entries(buildings.PitAssaultForge.cost).find(([id, amount]) => resources[id].currentQuantity < amount)) {
-                    soldiers = Math.round(650 / game.armyRating(1, "hellArmy"));
+                    soldiers = Math.round(650 / soldierRating);
                 }
             }
 
             // Reserve soldiers operating forge
-            if (buildings.PitSoulForge.stateOnCount > 0) {
+            if (buildings.PitSoulForge.stateOnCount > 0 && soldierRating  > 0) {
                 // export function soulForgeSoldiers() from portal.js
-                soldiers = Math.round(650 / game.armyRating(1, "hellArmy"));
+                soldiers = Math.round(650 / soldierRating);
                 if (game.global.portal.gun_emplacement) {
                     soldiers -= game.global.portal.gun_emplacement.on * (game.global.tech.hell_gun >= 2 ? 2 : 1);
                     if (soldiers < 0){
