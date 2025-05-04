@@ -6677,8 +6677,9 @@
         buildings.ProximaDysonSphere.overridePowered = -5;
         buildings.ProximaOrichalcumSphere.overridePowered = -8;
         buildings.ProximaElysaniteSphere.overridePowered = -18;
+        buildings.BlackholeStellarEngine.overridePowered = 0;
         // Numbers aren't exactly correct. That's fine - it won't mess with calculations - it's not something we can turn off and on. We just need to know that they *are* power generators, for autobuild, and that's enough for us.
-        // And it doesn't includes Stellar Engine at all. It can generate some power... But only when fully built, and you don't want to build 100 levels of engine just to generate 20MW.
+        // We don't handle the Stellar Engine at at all, it will be treated as mystery power in autoPower
     }
 
     function initialiseRaces() {
@@ -11391,6 +11392,10 @@
         }
 
         // Calculate the available power / resource rates of change that we have to work with
+        // This handles "mystery power" by starting with the leftover power of the previous tick, then
+        // counting backwards through powered buildings. Ideally availablePower should be 0 after this
+        // first loop, but doing the calculation like this automatically handles a lot of mechanics
+        // and complicated situations for us, so it often won't be beyond very simple early prestige MAD.
         let availablePower = resources.Power.currentQuantity;
         let missingProducer = {};
 
