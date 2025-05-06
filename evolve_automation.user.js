@@ -1770,7 +1770,7 @@
                 case "ultra_sludge":
                     return (game.global.stats.achieve['godslayer'] && game.global.stats.achieve['extinct_sludge']) ? 1 : 0;
                 case "hybrid":
-                    return 0;
+                    return (game.global.stats.achieve['what_is_best']?.e >= 5) ? 1 : 0;
             }
 
             let unboundMod = game.global.blood.unbound >= 4 ? 0.95 :
@@ -1817,7 +1817,7 @@
                 case "custom":
                     return `Complete an Ascension reset and be on a suitable planet for your chosen genus (${this.genus ? game.loc('genelab_genus_' + this.genus) : 'not set'}).`;
                 case "hybrid":
-                    return "???";
+                    return game.loc('wiki_achieve_what_is_best');
             }
 
             switch (this.genus) {
