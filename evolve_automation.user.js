@@ -1566,7 +1566,7 @@
                 return -1;
             }
 
-            const noMADRace = ["sludge", "ultra_sludge"];
+            const noMADRace = ["sludge", "ultra_sludge", "hellspawn"];
             const noGenusRace = ["custom", "junker", "sludge", "ultra_sludge", "hybrid"];
             const noGreatnessGenus = ["hybrid"];
             const challengeRace = ["junker", "sludge", "ultra_sludge"];
