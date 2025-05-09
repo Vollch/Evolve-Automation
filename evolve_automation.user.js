@@ -1568,7 +1568,7 @@
 
             const noMADRace = ["sludge", "ultra_sludge", "hellspawn"];
             const noGenusRace = ["custom", "junker", "sludge", "ultra_sludge", "hybrid"];
-            const noGreatnessGenus = ["hellspawn"];
+            const noGreatnessGenus = ["hellspawn", "hybrid"];
             const challengeRace = ["junker", "sludge", "ultra_sludge"];
             const greatnessReset = ["bioseed", "ascension", "terraform", "matrix", "retire", "eden"];
             const midTierReset = ["bioseed", "cataclysm", "whitehole", "vacuum", "terraform"];
