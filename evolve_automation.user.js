@@ -9306,7 +9306,9 @@
                         }
                         jobsToAssign = Math.min(jobsToAssign, jobMax[j]);
                     }
-                    if (job === jobs.Miner) {
+                    if (job === jobs.Miner && game.global.race['warlord']) {
+                        jobsToAssign = jobs.Miner.max;
+                    } else if (job === jobs.Miner) {
                         if (jobMax[j] === undefined) {
                             jobMax[j] = 0;
                             if (!minersDisabled) {
