@@ -4041,7 +4041,7 @@
         }, [ResourceProductionCost]), (f) => f.id, [{s: "smelter_fuel_p_", p: "priority"}]),
 
         initIndustry() {
-            if (game.global.race['steelen'] || (buildings.Smelter.count < 1 && !game.global.race['cataclysm'] && !game.global.race['orbit_decayed'] && !haveTech("isolation"))) {
+            if (game.global.race['steelen'] || (buildings.Smelter.count < 1 && !game.global.race['cataclysm'] && !game.global.race['orbit_decayed'] && !haveTech("isolation") && !game.global.race['warlord'])) {
                 return false;
             }
 
@@ -4196,7 +4196,8 @@
             let max = buildings.Factory.stateOnCount
                     + buildings.RedFactory.stateOnCount
                     + buildings.AlphaMegaFactory.stateOnCount * 2
-                    + buildings.TauFactory.stateOnCount * (haveTech("isolation") ? 5 : 3);
+                    + buildings.TauFactory.stateOnCount * (haveTech("isolation") ? 5 : 3)
+                    + buildings.WastelandHellFactory.stateOnCount * (3 + (game.global.portal?.hell_factory?.rank || 1));
             if (!game.global.city.factory) {
                 return max;
             }
@@ -4352,7 +4353,9 @@
         },
 
         initIndustry() {
-            this._graphPlant = game.global.race['truepath'] ? buildings.TitanGraphene : buildings.AlphaGraphenePlant;
+            this._graphPlant = game.global.race['warlord'] ? buildings.WastelandTwistedLab
+            : game.global.race['truepath'] ? buildings.TitanGraphene
+            : buildings.AlphaGraphenePlant;
             if ((this._graphPlant.instance?.count ?? 0) < 1) {
                 return false;
             }
