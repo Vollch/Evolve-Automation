@@ -6711,6 +6711,7 @@
         buildings.ProximaOrichalcumSphere.overridePowered = -8;
         buildings.ProximaElysaniteSphere.overridePowered = -18;
         buildings.BlackholeStellarEngine.overridePowered = 0;
+        buildings.WastelandIncinerator.overridePowered = -25;
         // Numbers aren't exactly correct. That's fine - it won't mess with calculations - it's not something we can turn off and on. We just need to know that they *are* power generators, for autobuild, and that's enough for us.
         // We don't handle the Stellar Engine at at all, it will be treated as mystery power in autoPower
     }
