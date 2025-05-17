@@ -5041,16 +5041,19 @@
                 }
             }
 
-            // Reserve soldiers operating forge
-            if (buildings.PitSoulForge.stateOnCount > 0 && soldierRating  > 0) {
-                // export function soulForgeSoldiers() from portal.js
-                soldiers = Math.round(650 / soldierRating);
-                if (game.global.portal.gun_emplacement) {
-                    soldiers -= game.global.portal.gun_emplacement.on * (game.global.tech.hell_gun >= 2 ? 2 : 1);
-                    if (soldiers < 0){
-                        soldiers = 0;
-                    }
+            // Reserve soldiers operating forge - check if it exists and could be powered, not if it's already powered
+            if (buildings.PitSoulForge.count > 0 && (buildings.PitSoulForge.autoStateEnabled || buildings.PitSoulForge.stateOnCount > 0) && soldierRating > 0) {
+                // Calculate number of soldiers needed for Soul Forge
+                let base = game.global.race['warlord'] ? 400 : 650;
+             let soulForgeSoldiers = Math.round(base / soldierRating);
+        
+                // Adjust for gun emplacements
+                if (buildings.PitGunEmplacement.count > 0) {
+                    soulForgeSoldiers -= Math.floor(buildings.PitGunEmplacement.stateOnCount * 1.5);
+                    soulForgeSoldiers = Math.max(1, soulForgeSoldiers);
                 }
+
+                soldiers += soulForgeSoldiers;
             }
 
             // Guardposts need at least one soldier free so lets just always keep one handy
