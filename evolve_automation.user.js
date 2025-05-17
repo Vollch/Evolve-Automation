@@ -8951,6 +8951,14 @@
             return;
         }
 
+        if (game.global.race['warlord']) {
+
+            //if (minionCount >= settings.warMinions) {
+            //    attackEnemyFortress();
+            //}
+            return;
+        }
+
         // Determine Patrol size and count
         let targetHellSoldiers = 0;
         let targetHellPatrols = 0;
