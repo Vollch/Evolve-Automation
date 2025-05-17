@@ -12785,7 +12785,7 @@
 
     function autoMech() {
         let m = MechManager;
-        if (!m.initLab() || $(`#mechList .mechRow[draggable=true]`).length > 0) {
+        if (game.global.race['warlord'] || !m.initLab() || $(`#mechList .mechRow[draggable=true]`).length > 0) {
             return;
         }
         let mechBay = game.global.portal.mechbay;
