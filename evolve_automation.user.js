@@ -1566,10 +1566,12 @@
                 return -1;
             }
 
-            const noMADRace = ["sludge", "ultra_sludge"];
-            const noGenusRace = ["custom", "junker", "sludge", "ultra_sludge", "hybrid"];
+            const noMADRace = ["sludge", "ultra_sludge", "hellspawn"];
+            const noPillarRace = ["custom", "junker", "sludge", "ultra_sludge", "hybrid", "hellspawn"];
             const noGreatnessGenus = ["hybrid"];
-            const challengeRace = ["junker", "sludge", "ultra_sludge"];
+            const noGreatnessRace = ["hellspawn"];
+            const noExtinctionRace = ["hellspawn"];
+            const challengeRace = ["junker", "sludge", "ultra_sludge", "hellspawn"];
             const greatnessReset = ["bioseed", "ascension", "terraform", "matrix", "retire", "eden"];
             const midTierReset = ["bioseed", "cataclysm", "whitehole", "vacuum", "terraform"];
             const highTierReset = ["ascension", "demonic", "apotheosis"];
@@ -1602,9 +1604,9 @@
                     weighting += 1000 * Math.max(0, starLevel - speciesPillarLevel);
                     goals.push("feat_equilibrium_name");
                     // Check genus pillar for Enlightenment
-                    if (!noGenusRace.includes(this.id)) {
+                    if (!noPillarRace.includes(this.id)) {
                         let genusPillar = Math.max(...Object.values(races)
-                          .filter(r => r.genus === this.genus && !noGenusRace.includes(r.id))
+                          .filter(r => r.genus === this.genus && !noPillarRace.includes(r.id))
                           .map(r => (game.global.pillars[r.id] ?? 0)));
                         let improve = starLevel - genusPillar;
                         if (improve > 0) {
@@ -1629,10 +1631,10 @@
 
             // Check greatness\extinction achievement
             if (greatnessReset.includes(settings.prestigeType)) {
-                if (!noGreatnessGenus.includes(this.genus)) {
+                if (!noGreatnessGenus.includes(this.genus) && !noGreatnessRace.includes(this.id)) {
                     checkAchievement(100, "genus_" + this.genus);
                 }
-            } else if (!noMADRace.includes(this.id) || settings.prestigeType !== "mad") {
+            } else if (!noExtinctionRace.includes(this.id) && (!noMADRace.includes(this.id) || settings.prestigeType !== "mad")) {
                 checkAchievement(100, "extinct_" + this.id);
             }
 
