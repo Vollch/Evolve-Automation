@@ -892,7 +892,7 @@
                 (this._tab === "eden" && !game.global.settings.showEden)) {
                 return false;
             }
-            return document.getElementById(this._vueBinding) !== null;
+            return this.vue !== undefined;
         }
 
         isSwitchable() {
