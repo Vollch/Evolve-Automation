@@ -13934,6 +13934,22 @@
                 notes.push(FleetManagerOuter.nextShipMsg);
             }
         }
+        if (obj === buildings.IsleSpiritBattery) {
+            // Pulled from game's edenic.js in v1.4.8
+            const batteries = buildings.IsleSpiritBattery.stateOnCount;
+            let coefficient = 0.9;
+
+            // TODO: Use script's implmentation of warlord buildings once they're finalized
+            if (game.global.race['warlord'] && game.global.eden['corruptor'] && game.global.tech?.asphodel >= 13) {
+                const corruptors = game.global.eden.corruptor.on;
+                coefficient = 1 - (1 + (corruptors || 0) * 0.03) / 10;
+            }
+
+            const current = 18_000 * (coefficient ** batteries);
+            const next = 18_000 * (coefficient ** (batteries + 1));
+            const diff = ((current - next) * buildings.IsleSpiritVacuum.stateOnCount) * (game.global.race['emfield'] ? 1.5 : 1);
+            notes.push(`Next level will decrease total consumption by ${getNiceNumber(diff)} MW`);
+        }
 
         if (obj.extraDescription) {
             notes.push(obj.extraDescription);
