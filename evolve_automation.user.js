@@ -19561,7 +19561,7 @@
     }
 
     function isEarlyGame() {
-        if (game.global.race['cataclysm'] || game.global.race['orbit_decayed'] || game.global.race['lone_survivor']) {
+        if (game.global.race['cataclysm'] || game.global.race['orbit_decayed'] || game.global.race['lone_survivor'] || game.global.race['warlord']) {
             return false;
         } else if (game.global.race['truepath'] || game.global.race['sludge'] || game.global.race['ultra_sludge']) {
             return !haveTech("high_tech", 7);
