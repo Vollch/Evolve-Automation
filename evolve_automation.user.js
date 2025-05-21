@@ -6788,8 +6788,14 @@
         priorityList.push(buildings.TauFusionGenerator);
         priorityList.push(buildings.TauGas2AlienSpaceStation);
 
+        priorityList.push(buildings.WastelandIncinerator);
+
         priorityList.push(buildings.RuinsHellForge);
         priorityList.push(buildings.RuinsInfernoPower);
+
+        priorityList.push(buildings.AsphodelEncampment);
+        priorityList.push(buildings.AsphodelRectory);
+        priorityList.push(buildings.AsphodelSoulEngine);
 
         priorityList.push(buildings.TitanElectrolysis);
         priorityList.push(buildings.TitanHydrogen);
@@ -7028,7 +7034,6 @@
         priorityList.push(buildings.RuinsAncientPillars);
 
         priorityList.push(buildings.WastelandThrone);
-        priorityList.push(buildings.WastelandIncinerator);
         priorityList.push(buildings.WastelandWarehouse);
         priorityList.push(buildings.WastelandHovel);
         priorityList.push(buildings.WastelandHellCasino);
@@ -7079,9 +7084,6 @@
         priorityList.push(buildings.SpireBazaar);
 
         priorityList.push(buildings.AsphodelMission);
-        priorityList.push(buildings.AsphodelEncampment);
-        priorityList.push(buildings.AsphodelRectory);
-        priorityList.push(buildings.AsphodelSoulEngine);
         priorityList.push(buildings.AsphodelMechStation);
         priorityList.push(buildings.AsphodelHarvester);
         priorityList.push(buildings.AsphodelProcessor);
