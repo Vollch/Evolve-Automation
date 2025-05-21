@@ -2040,6 +2040,10 @@
         }
 
         canGain() {
+            if (game.global.race.species === "hellspawn" && game.global.race['warlord']) {
+                return false;
+            }
+
             return this.gainEnabled && !this.purgeEnabled && this.canMutate("gain")
               && game.global.race[this.traitName] === undefined
               && !conflictingTraits.some((set) => (set[0] === this.traitName && game.global.race[set[1]] !== undefined)
