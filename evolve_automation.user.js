@@ -6454,7 +6454,7 @@
         buildings.SiriusAscensionMachine.gameMax = 100;
         buildings.SiriusAscensionTrigger.gameMax = 1;
         buildings.WastelandThrone.gameMax = 0; // TODO should probably be 1 or 2 with smart logic, 2 to toggle skill assignment mode and 3 to disable it? and then 1 after all skills assigned while a commander is captured
-        buildings.RuinsWarVault.gameMax = 2;
+        buildings.RuinsWarVault.gameMax = 1;
         buildings.BadlandsCodex.gameMax = 0; // TODO script just needs to know what it costs, for now it just tries to spam it
         buildings.PitSoulForge.gameMax = 1;
         buildings.PitSoulCapacitor.gameMax = 40;
