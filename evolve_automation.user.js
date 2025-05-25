@@ -6126,6 +6126,45 @@
             }
         },
 
+        DuplicateTrigger(seq) {
+            let indexToDuplicate = this.priorityList.findIndex(trigger => trigger.seq === seq);
+
+            if (indexToDuplicate === -1) {
+                return;
+            }
+
+            let triggerToDuplicate = this.priorityList[indexToDuplicate];
+            let trigger = structuredClone(triggerToDuplicate);
+            this.priorityList.splice(indexToDuplicate, 0, trigger);
+
+            for (let i = 0; i < this.priorityList.length; i++) {
+                let trigger = this.priorityList[i];
+                trigger.seq = i;
+                trigger.priority = i;
+            }
+        },
+
+        EvalizeTrigger(seq) {
+            let indexToDuplicate = this.priorityList.findIndex(trigger => trigger.seq === seq);
+
+            if (indexToDuplicate === -1) {
+                return;
+            }
+
+            let trigger = this.priorityList[indexToDuplicate];
+
+            let check = "";
+            switch (trigger.requirementType) {
+                case "Eval":
+                    check = trigger.requirementId;
+                    break;
+                default:
+                    check = `_("${trigger.requirementType}","${trigger.requirementId}")`;
+            }
+
+            win.prompt("Eval of this condition:", check);
+        },
+
         // This function only checks if two triggers use the same resource, it does not check storage
         actionConflicts(trigger) {
             for (let targetTrigger of this.targetTriggers) {
@@ -16383,12 +16422,11 @@
             <tr>
               <th class="has-text-warning" style="width:16%">Type</th>
               <th class="has-text-warning" style="width:18%">Value</th>
-              <th class="has-text-warning" style="width:11%" title="Numerical variables compared to this value using '>=', boolean variables - using '=='. String variables not currently supported by triggers.">Result</th>
+              <th class="has-text-warning" style="width:6%" title="Numerical variables compared to this value using '>=', boolean variables - using '=='. String variables not currently supported by triggers.">Result</th>
               <th class="has-text-warning" style="width:16%">Type</th>
               <th class="has-text-warning" style="width:18%">Id</th>
-              <th class="has-text-warning" style="width:11%">Count</th>
-              <th style="width:5%"></th>
-              <th style="width:5%"></th>
+              <th class="has-text-warning" style="width:6%">Count</th>
+              <th style="width:20%"></th>
             </tr>
             <tbody id="script_triggerTableBody"></tbody>
           </table>`);
@@ -16398,7 +16436,16 @@
 
         for (let i = 0; i < TriggerManager.priorityList.length; i++) {
             const trigger = TriggerManager.priorityList[i];
-            newTableBodyText += `<tr id="script_trigger_${trigger.seq}" value="${trigger.seq}" class="script-draggable"><td style="width:16%"></td><td style="width:18%"></td><td style="width:11%"></td><td style="width:16%"></td><td style="width:18%"></td><td style="width:11%"></td><td style="width:5%"></td><td style="width:5%"><span class="script-lastcolumn"></span></td></tr>`;
+            newTableBodyText += `
+            <tr id="script_trigger_${trigger.seq}" value="${trigger.seq}" class="script-draggable">
+              <td style="width:16%"></td>
+              <td style="width:18%"></td>
+              <td style="width:6%"></td>
+              <td style="width:16%"></td>
+              <td style="width:18%"></td>
+              <td style="width:6%"></td>
+              <td style="width:20%"></td>
+            </tr>`;
         }
         tableBodyNode.append($(newTableBodyText));
 
@@ -16440,7 +16487,16 @@
         let tableBodyNode = $('#script_triggerTableBody');
         let newTableBodyText = "";
 
-        newTableBodyText += `<tr id="script_trigger_${trigger.seq}" value="${trigger.seq}" class="script-draggable"><td style="width:16%"></td><td style="width:18%"></td><td style="width:11%"></td><td style="width:16%"></td><td style="width:18%"></td><td style="width:11%"></td><td style="width:5%"></td><td style="width:5%"><span class="script-lastcolumn"></span></td></tr>`;
+        newTableBodyText += `
+        <tr id="script_trigger_${trigger.seq}" value="${trigger.seq}" class="script-draggable">
+          <td style="width:16%"></td>
+          <td style="width:18%"></td>
+          <td style="width:6%"></td>
+          <td style="width:16%"></td>
+          <td style="width:18%"></td>
+          <td style="width:6%"></td>
+          <td style="width:20%"></td>
+        </tr>`;
 
         tableBodyNode.append($(newTableBodyText));
 
@@ -16582,6 +16638,20 @@
             TriggerManager.RemoveTrigger(trigger.seq);
             updateSettingsFromState();
             updateTriggerSettingsContent();
+        });
+
+        let duplicateTriggerButton = $('<a class="button is-dark is-small" style="width: 26px; height: 26px"><span>&#9282;</span></a>');
+        triggerElement.append(duplicateTriggerButton);
+        duplicateTriggerButton.on('click', function() {
+            TriggerManager.DuplicateTrigger(trigger.seq);
+            updateSettingsFromState();
+            updateTriggerSettingsContent();
+        });
+
+        let evalizeTriggerButton = $('<a class="button is-dark is-small" style="width: 26px; height: 26px"><span>E</span></a>');
+        triggerElement.append(evalizeTriggerButton);
+        evalizeTriggerButton.on('click', function() {
+            TriggerManager.EvalizeTrigger(trigger.seq);
         });
     }
 
