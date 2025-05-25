@@ -18891,29 +18891,55 @@
     }
 
     function updatePrestigeInTopBar() {
+        const parentId = 's-prestige-type';
+        let parentNode = document.getElementById(parentId);
+
         if (settings.displayPrestigeTypeInTopBar) {
-            addPrestigeToTopBar();
+            if (parentNode === null) {
+                // Check for planetWrap parent node
+                const planetWrap = document.querySelector('.planetWrap');
+                if (planetWrap === null)
+                    return; // Return and try again later if it doesn't exist yet
+
+                // Create new parent node
+                parentNode = document.createElement('span');
+                parentNode.setAttribute('id', parentId);
+                parentNode.setAttribute('style', 'border-left: 1px solid; margin-left: 0.75rem; padding-left: 0.75rem;');
+
+                // Add to planetWrap
+                planetWrap.append(parentNode);
+
+                // Add helper button to open prestige options modal
+                addOptionUI('s-prestige-type-helper-btn', `#${parentId}`, 'Prestige', buildPrestigeSettings);
+            }
         }
         else {
             removePrestigeFromTopBar();
+            return; // Disable and return if displayPrestigeTypeInTopBar isn't enabled
         }
 
-        let prestigeNode = document.getElementById("s-prestige-type");
-        if (prestigeNode == null) { return; } // Element has not yet been added, cannot update
+        // Update if prestigeType changed
+        if (parentNode.getAttribute('data-prestige') !== settings.prestigeType) {
+            let infoNode = parentNode.querySelector('.info');
+            if (infoNode === null) {
+                // Create info node if needed
+                infoNode = document.createElement('span');
+                infoNode.setAttribute('class', 'info');
 
-        let prestige = prestigeTypes.find(prest => prest.val === settings.prestigeType);
-        prestigeNode.title = prestige.hint;
-        prestigeNode.textContent = prestige.label;
-    }
+                parentNode.append(infoNode);
+            }
 
-    function addPrestigeToTopBar() {
-        let nodeId = "s-prestige-type";
-        if (document.getElementById(nodeId) !== null) { return; } // We've already added the info to the top bar
+            let prestige = prestigeTypes.find(entry => entry.val === settings.prestigeType);
+            if (prestige === undefined) {
+                // Somehow failed to find prestige details, mock up an object from settings
+                prestige = {label: settings.prestigeType, hint: ""};
+            }
 
-        let planetWrapNode = $("#topBar .planetWrap");
-        if (planetWrapNode.length === 0) { return; } // The node that we want to add it to doesn't exist yet
-
-        planetWrapNode.append($(`<span id="s-prestige-type" style="border-left: 1px solid; margin-left: 1rem; padding-left: 1rem;" ></span>`));
+            // Update node with new prestige info
+            infoNode.title = prestige.hint;
+            infoNode.textContent = prestige.label;
+            parentNode.setAttribute('data-prestige', settings.prestigeType);
+        }
     }
 
     function removePrestigeFromTopBar() {
