@@ -18777,16 +18777,6 @@
         document.documentElement.scrollTop = document.body.scrollTop = currentScrollPosition;
     }
 
-    function createQuickOptions(node, optionsElementId, optionsDisplayName, buildOptionsFunction) {
-        let optionsDiv = $(`<div style="cursor: pointer;" id="${optionsElementId}">${optionsDisplayName} Options</div>`);
-        node.append(optionsDiv);
-
-        addOptionUI(optionsElementId + "_btn", `#${optionsElementId}`, optionsDisplayName, buildOptionsFunction);
-        optionsDiv.on('click', function() {
-            openOptionsModal(optionsDisplayName, buildOptionsFunction);
-        });
-    }
-
     function createSettingToggle(node, settingKey, title, enabledCallBack, disabledCallBack) {
         let toggle = $(`
           <label class="switch script_bg_${settingKey}" tabindex="0" title="${title}">
@@ -19057,8 +19047,6 @@
             createSettingToggle(togglesNode, 'autoSupply', 'Send excess resources to Spire. Normal resources sent when they close to storage cap, craftables - when above requirements. Takes priority over ejector.', createSupplyToggles, removeSupplyToggles);
             createSettingToggle(togglesNode, 'autoNanite', 'Consume resources to produce Nanite. Normal resources sent when they close to storage cap, craftables - when above requirements. Takes priority over supplies and ejector.');
             createSettingToggle(togglesNode, 'autoReplicator', 'Use excess power to replicate resources.');
-
-            createQuickOptions(togglesNode, "s-quick-prestige-options", "Prestige", buildPrestigeSettings);
 
             togglesNode.append('<a class="button is-dark is-small" id="bulk-sell"><span>Bulk Sell</span></a>');
             $("#bulk-sell").on('mouseup', function() {
