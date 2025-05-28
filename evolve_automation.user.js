@@ -6134,7 +6134,16 @@
             }
 
             let triggerToDuplicate = this.priorityList[indexToDuplicate];
-            let trigger = structuredClone(triggerToDuplicate);
+            let trigger = new Trigger(
+                0,
+                0,
+                triggerToDuplicate.requirementType,
+                triggerToDuplicate.requirementId,
+                triggerToDuplicate.requirementCount,
+                triggerToDuplicate.actionType,
+                triggerToDuplicate.actionId,
+                triggerToDuplicate.actionCount,
+            )
             this.priorityList.splice(indexToDuplicate, 0, trigger);
 
             for (let i = 0; i < this.priorityList.length; i++) {
@@ -6145,13 +6154,13 @@
         },
 
         EvalizeTrigger(seq) {
-            let indexToDuplicate = this.priorityList.findIndex(trigger => trigger.seq === seq);
+            let indexToEval = this.priorityList.findIndex(trigger => trigger.seq === seq);
 
-            if (indexToDuplicate === -1) {
+            if (indexToEval === -1) {
                 return;
             }
 
-            let trigger = this.priorityList[indexToDuplicate];
+            let trigger = this.priorityList[indexToEval];
 
             let check = "";
             switch (trigger.requirementType) {
