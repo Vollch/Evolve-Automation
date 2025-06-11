@@ -4203,7 +4203,7 @@
            {s: 'production_p_', p: "priority"}]),
 
         initIndustry() {
-            if (buildings.Factory.count < 1 && buildings.RedFactory.count < 1 && buildings.TauFactory.count < 1) {
+            if (buildings.Factory.count < 1 && buildings.RedFactory.count < 1 && buildings.TauFactory.count < 1 && buildings.WastelandHellFactory.count < 1) {
                 return false;
             }
 
