@@ -1596,9 +1596,15 @@
             }
 
             // Check pillar
-            if ((settings.prestigeType === "ascension" && settings.prestigeAscensionPillar) || settings.prestigeType === "demonic") {
+            if (
+                (
+                    (settings.prestigeType === "ascension" && settings.prestigeAscensionPillar) ||
+                    settings.prestigeType === "demonic"
+                ) &&
+                game.global.race.universe !== 'micro'
+            ) {
                 let speciesPillarLevel = game.global.pillars[this.id] ?? 0;
-                let canPillar = !speciesPillarLevel && resources.Harmony.currentQuantity >= 1 && game.global.race.universe !== 'micro';
+                let canPillar = !speciesPillarLevel && resources.Harmony.currentQuantity >= 1;
                 let canUpgrade = speciesPillarLevel && speciesPillarLevel < starLevel;
                 if (canPillar || canUpgrade) {
                     weighting += 1000 * Math.max(0, starLevel - speciesPillarLevel);
@@ -10779,7 +10785,7 @@
     function isPillarFinished() {
         let speciesPillarLevel = game.global.pillars[game.global.race.species];
         let canPillar = !speciesPillarLevel && resources.Harmony.currentQuantity >= 1 && game.global.race.universe !== 'micro';
-        let canUpgrade = speciesPillarLevel && speciesPillarLevel < game.alevel();
+        let canUpgrade = speciesPillarLevel && speciesPillarLevel < game.alevel() && game.global.race.universe !== 'micro';
         // Always consider pillared if user doesn't want to wait for pillar, OR can't pillar + can't upgrade existing pillar
         return !settings.prestigeAscensionPillar || (!canPillar && !canUpgrade);
     }
