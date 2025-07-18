@@ -1608,6 +1608,9 @@
                 let canUpgrade = speciesPillarLevel && speciesPillarLevel < starLevel;
                 if (canPillar || canUpgrade) {
                     weighting += 1000 * Math.max(0, starLevel - speciesPillarLevel);
+                    // Strongly prioritize pillaring new non-challenge species to upgrading old ones or Equilibrium
+                    if (!speciesPillarLevel && !challengeRace.includes(this.id)) weighting += 100000;
+
                     goals.push("feat_equilibrium_name");
                     // Check genus pillar for Enlightenment
                     if (!noPillarRace.includes(this.id)) {
