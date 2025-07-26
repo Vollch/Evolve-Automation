@@ -1566,13 +1566,25 @@
                 return -1;
             }
 
+            // Races not allowed to execute MAD, invalid targets for MAD auto achievements even if there is nothing else to do
             const noMADRace = ["sludge", "ultra_sludge", "hellspawn"];
+            // Races that can't meaningfully contribute to genus pillar for Enlightenment, due to not-saved user chosen genus or otherwise
+            // (they do, however, have a per-race pillar!)
             const noPillarRace = ["custom", "junker", "sludge", "ultra_sludge", "hybrid", "hellspawn"];
+            // Genera that don't have a greatness achievement, and so should never get a weighting boost from missing greatness achievement
             const noGreatnessGenus = ["hybrid"];
+            // Races that can't execute any greatness reset, and so should never be used for greatness automation
             const noGreatnessRace = ["hellspawn"];
+            // Races that don't have an extinction achievement, invalid target for any extinction autoachievement
             const noExtinctionRace = ["hellspawn"];
+            // Challenges races get a huge penalty applied as they shouldn't be done automatically, unless there is nothing else to do
             const challengeRace = ["junker", "sludge", "ultra_sludge", "hellspawn"];
+
+            // List of resets that grant greatness
             const greatnessReset = ["bioseed", "ascension", "terraform", "matrix", "retire", "eden"];
+
+            // Subjectively chosen race lists that are known to perform well, slightly preferring them when multiple valid options are available for the same achievement
+            // "Mid" resets, "high" will likely also grant an Enlightenment tick
             const midTierReset = ["bioseed", "cataclysm", "whitehole", "vacuum", "terraform"];
             const highTierReset = ["ascension", "demonic", "apotheosis"];
             const bestForMid = ["human", "cath", "capybara", "gnome", "cyclops", "gecko", "dracnid", "entish", "shroomi", "antid", "sharkin", "dryad", "salamander", "yeti", "kamel", "imp", "unicorn", "synth", "shoggoth"];
