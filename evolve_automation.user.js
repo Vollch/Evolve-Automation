@@ -1599,7 +1599,7 @@
             if (
                 (
                     (settings.prestigeType === "ascension" && settings.prestigeAscensionPillar) ||
-                    settings.prestigeType === "demonic"
+                    ["demonic", "apotheosis"].includes(settings.prestigeType)
                 ) &&
                 game.global.race.universe !== 'micro'
             ) {
