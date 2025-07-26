@@ -1589,9 +1589,11 @@
             const highTierReset = ["ascension", "demonic", "apotheosis"];
             const bestForMid = ["human", "cath", "capybara", "gnome", "cyclops", "gecko", "dracnid", "entish", "shroomi", "antid", "sharkin", "dryad", "salamander", "yeti", "kamel", "imp", "unicorn", "synth", "shoggoth"];
             const bestForHigh = ["human", "cath", "capybara", "gnome", "cyclops", "gecko", "dracnid", "entish", "shroomi", "scorpid", "sharkin", "dryad", "salamander", "wendigo", "kamel", "balorg", "unicorn", "nano", "ghast"];
-            // Order and usefulness is very subjective but someone doing auto TP3 is probably going to unlock them all anyway
-            const goodImitates = ["dracnid", "octigoran", "unicorn", "salamander", "cyclops", "kamel", "arraak", "troll", "custom"];
-            const noImitates = ["junker", "nano", "synth"]; // Can't run Valdi, can't imitate synthetic except custom
+
+            // Imitates to prioritize if farming TP3
+            const goodImitates = ["wyvern", "dwarf", "dracnid", "octigoran", "unicorn", "salamander", "cyclops", "kamel", "arraak", "troll", "custom"];
+            // Races who cannot enter TP or cannot unlock imitate even if they can, due to either challenge conflicts or special case in rewards
+            const noImitates = ["junker", "nano", "synth", "hellspawn"];
 
             let goals = [];
             let weighting = 0;
