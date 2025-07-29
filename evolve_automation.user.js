@@ -18599,6 +18599,9 @@
             if (event[overrideKey]) {
                 event.preventDefault();
             }
+            if (event.target.nodeName === "INPUT" && !confirm("Are you sure you wish to change the Auto Build state of ALL buildings?")) {
+                event.preventDefault();
+            }
         });
     }
 
@@ -18665,6 +18668,9 @@
         })
         .on('click', function(event){
             if (event[overrideKey]) {
+                event.preventDefault();
+            }
+            if (event.target.nodeName === "INPUT" && !confirm("Are you sure you wish to change the Auto Power state of ALL buildings?")) {
                 event.preventDefault();
             }
         });
