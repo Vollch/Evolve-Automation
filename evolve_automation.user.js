@@ -11977,6 +11977,26 @@
                 maxStateOn = Math.max(maxStateOn, currentStateOn - 1);
             }
 
+            // If fleet management is enabled, only allow one 'excess' of each ship type
+            // Shifting one-at-a-time to allow for allocation to galaxies.
+            if (settings.autoFleet && !game.global.race['truepath'] && buildings.ChthonianMission.isComplete())
+            {
+                if (building === buildings.ScoutShip || building === buildings.CorvetteShip || building === buildings.FrigateShip ||
+                    building === buildings.CruiserShip || building === buildings.Dreadnought)
+                {
+                    let excess = game.global.galaxy.defense.gxy_gateway[building.id];
+                    if (excess > 1) {
+                        maxStateOn = Math.max(1, currentStateOn - 1);
+                    }
+                    else if (excess === 0){
+                        maxStateOn = Math.min(maxStateOn, currentStateOn + 1);
+                    }
+                    else {
+                        maxStateOn = currentStateOn;
+                    }
+                }
+            }
+
             maxStateOn = Math.max(0, Math.floor(maxStateOn));
 
             // Now when we know how many buildings we need - let's take resources
@@ -12885,7 +12905,21 @@
 
         // Assign remaining ships to gorddon, to utilize Symposium
         if (buildings.GorddonSymposium.stateOnCount > 0) {
-            allFleets.forEach(ship => allRegions[2].assigned[ship.name] += ship.count);
+            let ReqCrew = 0 ; //Required crew for gorddon (from piracy)
+            let CurCrew = 0; //Current crew for gorddon
+            for (const ship of allFleets){
+                let ShipCiv = game.actions.galaxy['gxy_gateway'][ship.name].ship.civ();
+                let ShipMil = game.actions.galaxy['gxy_gateway'][ship.name].ship.mil();
+
+                ReqCrew += allRegions[2].assigned[ship.name] * (ShipCiv + ShipMil);
+                CurCrew += def.gxy_gorddon[ship.name] * (ShipCiv + ShipMil);
+            }
+
+            let KnowledgeWithoutExcessCrew = resources.Knowledge.maxQuantity - ((CurCrew - ReqCrew) * 300); //While assigned crew give 200 over idle crew, auto-power may disable idle crew, so consider 300.
+            //NOTE: This breaks down in crew-limited situations, like some points in cataclysm or post-impact orbital decay. This struggle isn't limited to this function though.
+            if(state.knowledgeRequiredByTechs > KnowledgeWithoutExcessCrew) { //Only assign excess if we need it.
+                allFleets.forEach(ship => allRegions[2].assigned[ship.name] += ship.count);
+            }
         }
 
         let shipDeltas = allRegions.map(region => Object.entries(region.assigned).map(([ship, count]) => [ship, count - def[region.name][ship]]));
