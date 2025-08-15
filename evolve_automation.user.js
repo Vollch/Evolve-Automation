@@ -15970,7 +15970,7 @@
         currentNode.empty().off("*");
 
         currentNode.append(`
-          <div style="display: inline-block; width: 90%; text-align: left; margin-bottom: 10px;">
+          <div class="script_bg_prestigeType" style="display: inline-block; width: 90%; text-align: left; margin-bottom: 10px;">
             <label>
               <span>Prestige Type</span>
               <select class="script_prestigeType" style="height: 18px; width: 150px; float: right;">
@@ -16025,8 +16025,10 @@
 
             state.goal = "Standard";
             updateSettingsFromState();
-        })
-        .on('click', {label: "Prestige Type (prestigeType)", name: "prestigeType", type: "select", options: prestigeOptions}, openOverrideModal);
+        });
+        currentNode.find(".script_bg_prestigeType")
+          .toggleClass('inactive-row', Boolean(settingsRaw.overrides.prestigeType))
+          .on('click', {label: "Prestige Type (prestigeType)", name: "prestigeType", type: "select", options: prestigeOptions}, openOverrideModal);
 
         addSettingsToggle(currentNode, "prestigeWaitAT", "Disable prestiging under Accelerated Time", "Delay reset until all accelerated time will be used, to avoid wasting it");
         addSettingsToggle(currentNode, "prestigeMADIgnoreArpa", "Ignore early game A.R.P.A.", "Disables building any A.R.P.A. projects until MAD is researched, or rival have appeared");
