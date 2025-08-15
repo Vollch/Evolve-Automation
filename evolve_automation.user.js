@@ -47,6 +47,7 @@
 //   Auto Smelter does adjust rate of Inferno fuel and Oil for best cost and efficiency, but only when Inferno directly above oil.
 //   All settings can be reset to default at once by importing {} as script settings.
 //   Autoclicker can trivialize many aspects of the game, and ruin experience. Spoil your game at your own risk!
+//   Use of some advanced features to run your own custom code can cause the game to freeze on load if you add an infinite loop. Add ?safemode to the game's URL to temporarily deactivate script processing while still allowing access to configuration.
 
 (function($) {
     'use strict';
@@ -70,6 +71,8 @@
 
     const CONSUMPTION_BALANCE_MIN = 60; // Seconds of used resources to keep
     const CONSUMPTION_BALANCE_TARGET = 120; // Seconds of used resources to try producing
+
+    let safeMode = String(window.location).toLowerCase().indexOf("safemode") !== -1;
 
     // Class definitions
 
@@ -14107,6 +14110,13 @@
     }
 
     function updateOverrides() {
+        // Safe mode doesn't update overrides and always disables script toggle
+        if (safeMode) {
+            Object.assign(settings, settingsRaw);
+            settings.masterScriptToggle = false;
+            return;
+        }
+
         let xorLists = {};
         let overrides = {};
         for (let key in settingsRaw.overrides) {
@@ -14466,6 +14476,17 @@
         // Expose saving/loading functions so that they can be called by other scripts
         win.importAutomationSettings = importSettings;
         win.exportAutomationSettings = exportSettings;
+
+        // Safe mode warning, if active. Hope users can't miss it
+        if (safeMode) {
+            const msg = [
+                `Script safe mode is active to let you solve problems in your configuration.`,
+                `The masterScriptToggle is always disabled in this mode, and your overrides don't get evaluated.`,
+                `Fix the problems that required you to use this mode, then remove ?safemode from the URL to deactivate.`,
+            ].join("\n");
+            displayScriptWarningNode("Safe mode active", msg, null);
+            poly.messageQueue(msg, "warning", true, ['events', 'major_events']);
+        }
     }
 
     function updateDebugData() {
@@ -19032,6 +19053,10 @@
                   <label>More script options available in Settings tab<br>${overrideKeyLabel}+click options to open <span class="inactive-row">advanced configuration</span></label><br>
                 </div>
               </div>`);
+
+            if (safeMode) {
+                $('#resources').append(`<p>⚠️ Safe mode active, masterScriptToggle is disabled</p>`);
+            }
 
             let collapsibleNode = $('#toggleSettingsCollapsed');
             let togglesNode = $('#scriptToggles');
