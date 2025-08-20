@@ -1367,14 +1367,8 @@
         }
 
         isAffordable(max = false) {
-            // We can't use exposed checkAffordable with projects, so let's write it. Luckily project need only basic resources
-            let check = max ? "maxQuantity" : "currentQuantity";
-            for (let res in this.cost) {
-                if (resources[res][check] < this.cost[res]) {
-                    return false;
-                }
-            }
-            return true;
+            // Game's .checkAffordable doesn't work correctly on projects
+            return checkAffordableCustom(this.cost, max);
         }
 
         isClickable() {
@@ -13267,6 +13261,16 @@
                 }
             });
         }
+    }
+
+    function checkAffordableCustom(cost, max = false) {
+        let check = max ? "maxQuantity" : "currentQuantity";
+        for (let res in cost) {
+            if (!resources[res] || resources[res][check] < cost[res]) {
+                return false;
+            }
+        }
+        return true;
     }
 
     function updatePriorityTargets() {
