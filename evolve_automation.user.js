@@ -5646,6 +5646,10 @@
         },
 
         initLab() {
+            // TODO: Warlord is not supported yet and breaks a bunch of things, remove when support is implemented
+            if (game.global.race['warlord']) {
+                return false;
+            }
             if (buildings.SpireMechBay.count < 1) {
                 return false;
             }
