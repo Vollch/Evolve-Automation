@@ -13273,6 +13273,37 @@
         return true;
     }
 
+    function getQueuedItemObj(queueItem) {
+        // id, name: used by active targets UI
+        // title: used in conflict targets
+        // cost, isAffordable: used by priority targets check below
+        if (queueItem.action === "tp-ship") {
+            return {
+                id: queueItem.id,
+                name: queueItem.label,
+                title: queueItem.label,
+                cost: poly.shipCosts(queueItem.type),
+                isAffordable: function (max) { return checkAffordableCustom(this.cost, max); },
+            };
+        }
+        else if (queueItem.action === "hell-mech") {
+            let [gems, supply] = MechManager.getMechCost(queueItem.type);
+            return {
+                id: queueItem.id,
+                name: queueItem.label,
+                title: queueItem.label,
+                cost: {
+                    Soul_Gem: gems,
+                    Supply: supply,
+                },
+                isAffordable: function(max) { return checkAffordableCustom(this.cost, max); },
+            };
+        }
+        else {
+            return buildingIds[queueItem.id] || arpaIds[queueItem.id];
+        }
+    }
+
     function updatePriorityTargets() {
         state.conflictTargets = [];
         state.queuedTargets = [];
@@ -13283,11 +13314,11 @@
 
         // Building and research queues
         let queueSave = settings.prioritizeQueue.includes("save");
-        [{type: "queue", noorder: "qAny", map: (id) => buildingIds[id] || arpaIds[id]},
-         {type: "r_queue", noorder: "qAny_res", map: (id) => techIds[id]}].forEach(queue => {
+        [{type: "queue", noorder: "qAny", map: getQueuedItemObj},
+         {type: "r_queue", noorder: "qAny_res", map: (item) => techIds[item.id]}].forEach(queue => {
             if (game.global[queue.type].display) {
                 for (let item of game.global[queue.type].queue) {
-                    let obj = queue.map(item.id);
+                    let obj = queue.map(item);
                     if (obj) {
                         state.queuedTargetsAll.push(obj);
                         if (obj.isAffordable(true)) {
@@ -13542,7 +13573,8 @@
                 targetSegments = '',
                 researchTimeLeft = 0,
                 isArpaProject = type === 'arpa' || target instanceof Project,
-                isMultiSegmented = target.is && target.is.multiSegmented;
+                isMultiSegmented = target.is && target.is.multiSegmented,
+                isTablessBuilding = type === 'buildings' && !target._tab;
 
             if (target.count && !isMultiSegmented) {
                 targetName += ` #${target.count + 1}`;
@@ -13636,7 +13668,7 @@
             // for finding element in queue
             let queueid = '';
             if (type === 'buildings') {
-                queueid = `${target._tab}-${target.id}`;
+                queueid = isTablessBuilding ? `${target.id}` : `${target._tab}-${target.id}`;
             } else if (type === 'arpa') {
                 queueid = `${target._tab}${target.id}`;
             } else if (type === 'research' || type === 'triggers') {
