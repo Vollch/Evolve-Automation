@@ -6505,7 +6505,10 @@
         updateTabs(false);
 
         // Lets set our crate / container resource requirements
-        Object.defineProperty(resources.Crates, "cost", {get: () => isLumberRace() ? {Plywood: 10} : {Stone: 200}});
+        Object.defineProperty(resources.Crates, "cost", { get: () => (
+                (game.global.race['warlord'] && game.global.race['iron_wood']) ? { Lumber: 200 } :
+                isLumberRace() ? { Plywood: 10 } : { Stone: 200 }
+            )});
         resources.Containers.cost["Steel"] = 125;
 
         JobManager.craftingJobs = Object.values(crafter);
