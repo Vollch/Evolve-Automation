@@ -5852,7 +5852,7 @@
         updateBestWeapon() {
             let bestMod = 0;
             let list = poly.monsters[game.global.portal.spire.boss].weapon;
-            for (let weapon in list) {
+            for (let weapon of MechManager.Weapon) {
                 let mod = list[weapon];
                 if (mod > bestMod) {
                     bestMod = mod;
