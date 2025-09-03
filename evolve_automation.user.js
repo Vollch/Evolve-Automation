@@ -1578,7 +1578,7 @@
             const challengeRace = ["junker", "sludge", "ultra_sludge", "hellspawn"];
 
             // List of resets that grant greatness
-            const greatnessReset = ["bioseed", "ascension", "terraform", "matrix", "retire", "eden"];
+            const greatnessReset = ["bioseed", "ascension", "terraform", "matrix", "retire", "eden", "apotheosis"];
 
             // Subjectively chosen race lists that are known to perform well, slightly preferring them when multiple valid options are available for the same achievement
             // "Mid" resets, "high" will likely also grant an Enlightenment tick
