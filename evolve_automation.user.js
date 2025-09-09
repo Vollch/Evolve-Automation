@@ -13381,6 +13381,28 @@
             state.conflictTargets.push({name: FleetManagerOuter.nextShipName, cause: "Ship", cost: FleetManagerOuter.nextShipCost});
         }
 
+        // Reserve gems for mechs
+        if (settings.autoMech && MechManager.initLab() && buildings.AsphodelEncampment.count === 0) {
+            let mechBay = game.global.portal.mechbay;
+            let baySpace = mechBay.max - mechBay.bay;
+
+            // only reserve gems if we have bay space
+            if (baySpace > 0) {
+                let newSize = !haveTask("mech") ?
+                    (settings.mechBuild === "random" ? MechManager.getPreferredSize()[0] : mechBay.blueprint.size) :
+                    "titan";
+                let [newGems, newSupply, newSpace] = MechManager.getMechCost({ size: newSize });
+
+                if (newGems > 0) {
+                    state.conflictTargets.push({
+                        name: `Next mech (${newSize})`,
+                        cause: "Mech",
+                        cost: { Soul_Gem: newGems }
+                    });
+                }
+            }
+        }
+
         if (settings.autoTrigger) {
             TriggerManager.resetTargetTriggers();
             let triggerSave = settings.prioritizeTriggers.includes("save");
