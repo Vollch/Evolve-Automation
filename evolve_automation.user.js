@@ -14111,9 +14111,8 @@
             const batteries = buildings.IsleSpiritBattery.stateOnCount;
             let coefficient = 0.9;
 
-            // TODO: Use script's implmentation of warlord buildings once they're finalized
-            if (game.global.race['warlord'] && game.global.eden['corruptor'] && game.global.tech?.asphodel >= 13) {
-                const corruptors = game.global.eden.corruptor.on;
+            if (game.global.race['warlord'] && buildings.AsphodelCorruptor && game.global.tech?.asphodel >= 13) {
+                const corruptors = buildings.AsphodelCorruptor.on;
                 coefficient = 1 - (1 + (corruptors || 0) * 0.03) / 10;
             }
 
