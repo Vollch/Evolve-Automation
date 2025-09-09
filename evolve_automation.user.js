@@ -3176,6 +3176,8 @@
                       bonus = "know";
                   } else if (game.global.city.calendar.moon > 21){
                       bonus = "tax";
+                  } else if ([0, 7, 14, 21].includes(game.global.city.calendar.moon)){
+                    bonus = "rotating";
                   } else {
                       return true;
                   }
@@ -17681,7 +17683,8 @@
                              {val: "morale", label: "Morale", hint: "Build only Morale Shrines"},
                              {val: "metal", label: "Metal", hint: "Build only Metal Shrines"},
                              {val: "know", label: "Knowledge", hint: "Build only Knowledge Shrines"},
-                             {val: "tax", label: "Tax", hint: "Build only Tax Shrines"}];
+                             {val: "tax", label: "Tax", hint: "Build only Tax Shrines"},
+                             {val: "rotating", label: "Rotating", hint: "Build Shrines during quarter/full phases for rotating effect shrines"}];                             
         addSettingsSelect(currentNode, "buildingShrineType", "Magnificent shrine", "Auto Build shrines only at moons of chosen shrine", shrineOptions);
         addSettingsNumber(currentNode, "slaveIncome", "Minimum income to buy slave", "Script will use Slave Market only when money is capped, or have income above given number");
 
