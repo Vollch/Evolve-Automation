@@ -15592,7 +15592,7 @@
             case "list":
                 return $(`
                   <span></span>`)
-               .text(value.map(item => options.list[item].name).join(", "));
+               .text(value.map(item => options.list[item]?.name ?? "[Invalid item]").join(", "));
             default:
                 return $(`
                   <span></span>`)
@@ -15614,7 +15614,7 @@
                 return node.find('input').prop('checked', value);
             case "list":
                 if (id === "researchIgnore") {
-                    return node.text(value.map(item => techIds[item].name).join(", "));
+                    return node.text(value.map(item => techIds[item]?.name ?? "[Invalid item]").join(", "));
                 } // else default
             default:
                 return node.text(JSON.stringify(value));
