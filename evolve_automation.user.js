@@ -3167,7 +3167,7 @@
       ],[
           () => game.global.race['magnificent'] && settings.buildingShrineType !== "any",
           (building) => {
-              if (building === buildings.Shrine) {
+              if (building.id && building.id.includes('shrine')) {
                   let bonus = null;
                   if (game.global.city.calendar.moon > 0 && game.global.city.calendar.moon < 7){
                       bonus = "morale";
@@ -3429,7 +3429,7 @@
           () => settings.buildingWeightingHorseshoeUseless
       ],[
           () => game.global.race.calm && resources.Zen.currentQuantity < resources.Zen.maxQuantity,
-          (building) => building === buildings.MeditationChamber,
+          (building) => building.id.includes('meditation'),
           () => "No more Meditation Space needed",
           () => settings.buildingWeightingZenUseless
       ],[
