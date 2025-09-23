@@ -2817,9 +2817,9 @@
         WastelandDigDemon: new Action("Wasteland Dig Demon Burrow (Warlord)", "portal", "dig_demon", "prtl_wasteland"),
         WastelandTunneler: new Action("Wasteland Tunneler Demon (Warlord)", "portal", "tunneler", "prtl_wasteland"),
         WastelandBrute: new Action("Wasteland Brute Hut (Warlord)", "portal", "brute", "prtl_wasteland", {garrison: true}),
-        WastelandAltar: new Action("Wasteland Sacrificial Altar (Warlord)", "portal", "s_alter", "prtl_wasteland"),
-        WastelandShrine: new Action("Wasteland Shrine (Warlord)", "portal", "shrine", "prtl_wasteland"),
-        WastelandMeditationChamber: new Action("Wasteland Meditation Chamber (Warlord)", "portal", "meditation", "prtl_wasteland"),
+        WastelandAltar: new CityAction("Wasteland Sacrificial Altar (Warlord)", "portal", "s_alter", "prtl_wasteland"),
+        WastelandShrine: new CityAction("Wasteland Shrine (Warlord)", "portal", "shrine", "prtl_wasteland"),
+        WastelandMeditationChamber: new CityAction("Wasteland Meditation Chamber (Warlord)", "portal", "meditation", "prtl_wasteland"),
 
         PitMission: new Action("Pit Mission", "portal", "pit_mission", "prtl_pit"),
         PitAssaultForge: new Action("Pit Assault Forge", "portal", "assault_forge", "prtl_pit"),
