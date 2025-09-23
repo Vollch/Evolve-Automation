@@ -1157,6 +1157,11 @@
                 return 0;
             }
 
+            if (this === buildings.Banquet) {
+                // Banquet hall uses "level" as build count if >= 1
+                return this.instance?.count ? this.instance.level : 0;
+            }
+
             return this.instance?.count ?? 0;
         }
 
@@ -11655,6 +11660,11 @@
             }
             if (settings.buildingsLimitPowered) {
                 maxStateOn = Math.min(maxStateOn, building.autoMax);
+            }
+
+            // Banquet just has a single on/off switch even above level 1
+            if (building === buildings.Banquet) {
+                maxStateOn = Math.min(maxStateOn, 1);
             }
 
             // Max powered amount
