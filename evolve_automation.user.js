@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         Evolve
 // @namespace    http://tampermonkey.net/
-// @version      3.3.1.147
+// @version      3.3.1.148
 // @description  try to take over the world!
 // @downloadURL  https://github.com/Vollch/Evolve-Automation/raw/master/evolve_automation.user.js
 // @updateURL    https://github.com/Vollch/Evolve-Automation/raw/master/evolve_automation.meta.js
@@ -1562,6 +1562,10 @@
             return game.races[this.id].type;
         }
 
+        get hybrid() {
+            return game.races[this.id].hybrid ?? [];
+        }
+
         getWeighting(verbose) {
             // Locked races always have zero weighting
             let habitability = this.getHabitability();
@@ -1828,7 +1832,9 @@
                 case "eldritch":
                     return game.global.stats.achieve['nightmare']?.mg ? 1 : 0;
                 case "hybrid":
-                    return game.global.stats.achieve['godslayer'] ? 1 : 0;
+                    return (isAchievementUnlocked("godslayer", 1, "standard") &&
+                      (!this.hybrid.includes("synthetic") || isAchievementUnlocked("obsolete", 5, "standard")) &&
+                      (!this.hybrid.includes("eldritch") || isAchievementUnlocked("nightmare", 1, "magic"))) ? 1 : 0;
                 case undefined: // Nonexistent custom
                     return 0;
                 default:
@@ -1872,7 +1878,14 @@
                 case "eldritch":
                     return game.loc('wiki_achieve_nightmare');
                 case "hybrid":
-                    return game.loc('wiki_achieve_godslayer');
+                    let desc = game.loc('wiki_achieve_godslayer');
+                    if (this.hybrid.includes("synthetic")) {
+                        desc += `<br>${game.loc('wiki_achieve_obsolete')}`;
+                    }
+                    if (this.hybrid.includes("eldritch")) {
+                        desc += `<br>${game.loc('wiki_achieve_nightmare')}`;
+                    }
+                    return desc;
                 case undefined:
                     return "Unknown.";
                 default: // No special conditions
