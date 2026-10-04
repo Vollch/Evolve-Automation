@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         Evolve
 // @namespace    http://tampermonkey.net/
-// @version      3.3.1.150
+// @version      3.3.1.151
 // @description  try to take over the world!
 // @downloadURL  https://github.com/Vollch/Evolve-Automation/raw/master/evolve_automation.user.js
 // @updateURL    https://github.com/Vollch/Evolve-Automation/raw/master/evolve_automation.meta.js
@@ -2391,7 +2391,7 @@
         AntiPlasmid: new PrestigeResource("Anti-Plasmid", "AntiPlasmid"),
         Supercoiled: new PrestigeResource("Supercoiled", "Supercoiled"),
         Phage: new PrestigeResource("Phage", "Phage"),
-        Dark: new PrestigeResource("Dark", "Dark"),
+        Dark: new PrestigeResource("Dark Energy", "Dark"),
         Harmony: new PrestigeResource("Harmony", "Harmony"),
         AICore: new PrestigeResource("AI Core", "AICore"),
 
