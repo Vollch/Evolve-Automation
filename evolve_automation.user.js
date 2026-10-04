@@ -2391,7 +2391,7 @@
         AntiPlasmid: new PrestigeResource("Anti-Plasmid", "AntiPlasmid"),
         Supercoiled: new PrestigeResource("Supercoiled", "Supercoiled"),
         Phage: new PrestigeResource("Phage", "Phage"),
-        DarkEnergy: new PrestigeResource("Dark Energy", "DarkEnergy"),
+        Dark: new PrestigeResource("Dark Energy", "Dark"),
         Harmony: new PrestigeResource("Harmony", "Harmony"),
         AICore: new PrestigeResource("AI Core", "AICore"),
 
@@ -14143,8 +14143,8 @@
         if (obj === buildings.BadlandsAttractor) {
             let influx = 5 * (1 + (obj.stateOnCount * 0.22));
             let gem_chance = game.global.stats.achieve.technophobe?.l >= 5 ? 9000 : 10000;
-            if (game.global.race.universe === 'evil' && resources.DarkEnergy.currentQuantity > 1) {
-                let de = resources.DarkEnergy.currentQuantity * (1 + resources.Harmony.currentQuantity * 0.01);
+            if (game.global.race.universe === 'evil' && resources.Dark.currentQuantity > 1) {
+                let de = resources.Dark.currentQuantity * (1 + resources.Harmony.currentQuantity * 0.01);
                 gem_chance -= Math.round(Math.log2(de) * 2);
             }
             gem_chance = Math.round(gem_chance * (0.948 ** obj.stateOnCount));
